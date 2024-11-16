@@ -1,0 +1,58 @@
+# docker-compose.yaml
+# Version 0.0.1 - 240928
+# initial run: docker-compose up 
+
+
+# ### version: '3'  ## It is not needed for docker-compose versions above 1.27.0
+
+services:
+
+  frontend:
+    # image: arm64v8/nginx:bookworm   # Docker hub image - however, we prefer to build it from a Dockerfile
+    build:
+      context: ./frontend  # Dockerfile should be in this folder
+      dockerfile: Dockerfile
+    container_name: net2-frontend-nginx   # Nginx version(240915) 1.22.1
+    ports:
+      - "8001:80"  # Port 8001 on host is mapped to port 80 in the container
+    networks:
+      - net2
+    volumes:
+      - ~/DOCKER_SHARE1/net2/frontend:/usr/share1  # Shared volume for service1
+    working_dir: /usr/share1  # Set the working directory to /usr/share1
+
+  backend:
+    # image: arm64v8/debian:bookworm  # Docker hub image - however, we prefer to build it from a Dockerfile
+    build:
+      context: ./backend  # Dockerfile should be in this folder
+      dockerfile: Dockerfile
+    container_name: net2-backend-api      # Java Version: 17
+    # expose:     # We can expose the port here, however, we prefer to expose it from the Dockerfile
+    #   - "8080"
+    networks:
+      - net2
+    volumes:
+      - ~/DOCKER_SHARE1/net2/backend:/usr/share1  # Map the backend folder to /usr/share1 in the container
+    working_dir: /usr/share1  # Set the working directory to /usr/share1
+  
+  database:
+    image: arm64v8/mariadb:11.5.2-ubi9      # Docker hub image - Mariadb Version (240915): 11.5.2-ubi9 
+    container_name: net2-database-mariadb   
+    environment:                            # Env variables for auto-upgrade from 10 to 11 if we want to use the older version schemas see more at: https://github.com/docker-library/docs/issues/2164 and  https://docs.photoprism.app/getting-started/troubleshooting/mariadb/#auto-upgrade 
+      MARIADB_AUTO_UPGRADE: "1"
+      MARIADB_INITDB_SKIP_TZINFO: "1"
+    expose:
+      - "3306"  # Exposes port 3306 to other containers within the same Docker network (no host mapping)
+    networks:
+      - net2
+    volumes:
+      - ~/DOCKER_SHARE1/net2/database:/usr/share1  # Map the database folder to /usr/share1 in the container
+      - ~/DOCKER_SHARE1/net2/database/data/mysql:/var/lib/mysql # Map the old container data-folder to the 'standard' folder /var/lib/mysql in the container
+    working_dir: /usr/share1  # Set the working directory to /usr/share1
+
+networks:
+  net2:
+    driver: bridge  # Define the user-defined bridge network
+
+
+
