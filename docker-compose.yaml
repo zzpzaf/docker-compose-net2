@@ -1,5 +1,7 @@
 # docker-compose.yaml
-# Version 0.0.1 - 240928
+# -----------------------------------------
+# Version 0.0.2 - 241116
+# -----------------------------------------
 # initial run: docker-compose up 
 
 
@@ -12,7 +14,7 @@ services:
     build:
       context: ./frontend  # Dockerfile should be in this folder
       dockerfile: Dockerfile
-    container_name: net2-frontend-nginx   # Nginx version(240915) 1.22.1
+    container_name: net2-frontend-nginx-node   # Nginx version(240915) 1.22.1
     ports:
       - "8001:80"  # Port 8001 on host is mapped to port 80 in the container
     networks:
@@ -20,6 +22,9 @@ services:
     volumes:
       - ~/DOCKER_SHARE1/net2/frontend:/usr/share1  # Shared volume for service1
     working_dir: /usr/share1  # Set the working directory to /usr/share1
+    environment:
+      NODE_ENV: production  # Set Node.js environment to production
+
 
   backend:
     # image: arm64v8/debian:bookworm  # Docker hub image - however, we prefer to build it from a Dockerfile

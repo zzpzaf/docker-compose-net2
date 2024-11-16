@@ -1,6 +1,7 @@
 
 # Dockerfile
-# Version 0.0.1 frontend with nginx - 240928
+# ---------------------------------------------------------------------------------------------
+# Version 0.0.2 frontend with nginx and node - 241116
 # ---------------------------------------------------------------------------------------------
 
 # Use Debian 12 (Bookworm) as the base image
@@ -13,8 +14,8 @@ FROM arm64v8/debian:bookworm
 #     rm -rf /var/lib/apt/lists/*
 
 
-# Install Nginx
-RUN apt-get -y update && apt-get -y install nginx && \
+# Install Nginx and Node
+RUN apt-get -y update && apt-get -y install nginx nodejs npm && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
@@ -22,7 +23,7 @@ RUN apt-get -y update && apt-get -y install nginx && \
 # COPY /usr/share/nginx/html/index.html /usr/share/nginx/html/index.html.org
 # COPY ./my-index.html /usr/share/nginx/html/index.html
 #- COPY ./my-nginx.conf /etc/nginx/conf.d/default.conf
-COPY ./my-default /etc/nginx/sites-available/default
+COPY ./my-default.conf /etc/nginx/sites-available/default
 
 
 # EXPOSE 80
@@ -35,8 +36,9 @@ COPY ./my-default /etc/nginx/sites-available/default
 # RUN useradd -rm -p "$(openssl passwd -6 passw01)" debanos && usermod -aG sudo debanos	
 
 
-# Run the Nginx server
-CMD ["nginx", "-g", "daemon off;"]
+# Run the Nginx server and Node (Express) server
+# CMD ["nginx", "-g", "daemon off;"]
+CMD ["sh", "-c", "nginx -g 'daemon off;' & node /usr/share1/nginx/wwwroot/server/server.mjs"]
 
 
 # Switch to user debanos
