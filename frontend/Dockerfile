@@ -1,7 +1,7 @@
 
 # Dockerfile
 # ---------------------------------------------------------------------------------------------
-# Version 0.0.2 frontend with nginx and node - 241116
+# Version 0.0.3 frontend with nginx, node, and PM2 - 241117
 # ---------------------------------------------------------------------------------------------
 
 # Use Debian 12 (Bookworm) as the base image
@@ -19,12 +19,11 @@ RUN apt-get -y update && apt-get -y install nginx nodejs npm && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-# configuration and startup index.html
-# COPY /usr/share/nginx/html/index.html /usr/share/nginx/html/index.html.org
-# COPY ./my-index.html /usr/share/nginx/html/index.html
-#- COPY ./my-nginx.conf /etc/nginx/conf.d/default.conf
-COPY ./my-default.conf /etc/nginx/sites-available/default
+#Install globally the PM2 process manager 
+RUN npm install -g pm2 
 
+# Copy the configuration for the default server for the NGINX
+COPY ./my-default.conf /etc/nginx/sites-available/default
 
 # EXPOSE 80
 
@@ -36,9 +35,14 @@ COPY ./my-default.conf /etc/nginx/sites-available/default
 # RUN useradd -rm -p "$(openssl passwd -6 passw01)" debanos && usermod -aG sudo debanos	
 
 
-# Run the Nginx server and Node (Express) server
+# Run the Nginx server 
 # CMD ["nginx", "-g", "daemon off;"]
-CMD ["sh", "-c", "nginx -g 'daemon off;' & node /usr/share1/nginx/wwwroot/server/server.mjs"]
+
+# Run the Nginx server and Node (Express) server
+# CMD ["sh", "-c", "nginx -g 'daemon off;' & node /usr/share1/nginx/wwwroot/server/server.mjs"]
+# Use the startup script as the CMD
+CMD ["/usr/share1/start_frontend.sh"]
+
 
 
 # Switch to user debanos
