@@ -4,6 +4,10 @@
 
 This repository contains a Docker Compose setup for an Angular Server-Side Rendering (SSR) application using NGINX and Node.js, a Java Spring Boot backend API, and a MariaDB database. The project is designed to run in a 3-container setup using a shared Docker network (`net2`).
 
+
+<!-- ![app image](containers-mine3.png) -->
+<img style="display: block; margin: auto;" src="containers-mine3.png" alt="Project Image" width="600" height="450">
+
 ## Project Overview
 
 The setup includes the following services:
@@ -11,10 +15,12 @@ The setup includes the following services:
 1. **Frontend**:
    - NGINX serves the Angular SSR application with a Node.js Express server for server-side rendering.
    - Handles static assets and proxies API requests to the backend service.
+   - The 'pm2' node service manager used to start the node-express server and momitors constantly for newer server.mjs files
 
 2. **Backend**:
    - Java Spring Boot API running in a separate container.
    - Provides RESTful services for the Angular frontend.
+   - The 'supervisord' process control is used to mange the executable .jar file and restarts it when a newer .jar file is sensed.  
 
 3. **Database**:
    - MariaDB container for persistent data storage.
@@ -44,6 +50,8 @@ net2/
 `-- frontend
     |-- Dockerfile
     |-- my-default.conf
+    |-- pm2.config.js
+    |-- start_frontend.sh
     `--- nginx
         `-- wwwroot			<--- subfolder
 
@@ -146,6 +154,7 @@ This project is licensed under the MIT License.
 
 Read more at my related posts: 
 ### "Containerize and automate the deployment of a 3-tier full-stack project"
+### "Integrate Server-Side Rendering (SSR) into your existing Angular project"
 
 * **[Medium](https://medium.com/@zzpzaf.se)**
 * **[DevXperiences](https://www.devxperiences.com/developers-posts/)** 
